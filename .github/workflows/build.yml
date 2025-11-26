@@ -42,6 +42,18 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
+          # BEGIN ANALYSIS
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin `
+            /k:"hassum201_Final-" `
+            /o:"hassum201" `
+            /d:sonar.login="$env:SONAR_TOKEN"
+
+          # BUILD SPECIFIC SOLUTION (this fixes MSB1011)
+          dotnet build BadCleanArch.sln --configuration Release
+
+          # END ANALYSIS
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
+            /d:sonar.login="$env:SONAR_TOKEN"
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"hassum201_Final-" /o:"hassum201" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
